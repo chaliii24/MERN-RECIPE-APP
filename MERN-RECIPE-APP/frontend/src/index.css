@@ -1,0 +1,112 @@
+/* Tailwind layers */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Ensure body takes full height */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Ensures the footer sticks to the bottom */
+}
+
+.flex-grow {
+  flex-grow: 1; /* Takes up remaining space, pushes footer down */
+}
+
+
+@keyframes wave {
+  0% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+  60% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+.animate-wave {
+  display: inline-block;
+  animation: wave 2s infinite;
+  transform-origin: 70% 70%;
+}
+
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(5deg); }
+}
+.animate-wiggle {
+  display: inline-block;
+  animation: wiggle 1s infinite;
+  transform-origin: center;
+}
+
+
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  20%, 22%, 24%, 55% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+.animate-flicker {
+  animation: flicker 1.5s linear infinite;
+  transform-origin: center;
+  display: inline-block;
+}
+
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin-slow {
+  animation: spin-slow 6s linear infinite;
+  display: inline-block;
+  transform-origin: center;
+}
+
+
+@keyframes pulse-scale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+.animate-pulse-scale {
+  animation: pulse-scale 2s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+}
+
+
+@keyframes pop-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.animate-pop-pulse {
+  animation: pop-pulse 1.8s ease-in-out infinite;
+  display: inline-block;
+  transform-origin: center;
+}
