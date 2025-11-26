@@ -6,18 +6,7 @@ import { motion } from "framer-motion";
 import { Pencil, Trash2, Heart } from "lucide-react";
 import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 
-// Helper function to handle image URLs from local server or Cloudinary
-const getImageUrl = (imagePath) => {
-  if (!imagePath) return ""; // Return empty string or path to a default image
-  // Check if the path is an absolute URL (Cloudinary)
-  if (imagePath.startsWith("http")) {
-    return imagePath;
-  }
-  // Otherwise, assume it's a local path from the backend
-  return `http://localhost:5000${imagePath}`;
-};
-
-// Simple Star component
+// Simple Star component for Rating
 const Star = ({ filled, onClick, onMouseEnter, onMouseLeave }) => (
   <svg
     onClick={onClick}
@@ -28,7 +17,7 @@ const Star = ({ filled, onClick, onMouseEnter, onMouseLeave }) => (
     stroke="gold"
     strokeWidth="2"
     viewBox="0 0 24 24"
-    className="w-6 h-6 cursor-pointer"
+    className="w-6 h-6 cursor-pointer transition-colors duration-150"
   >
     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
   </svg>
@@ -89,6 +78,7 @@ const RecipeDetail = () => {
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
+        // Axios uses the base URL set in main.jsx (VITE_API_URL or localhost)
         const res = await axios.get(`/api/recipes/${id}`);
         const recipeData = res.data;
         setRecipe(recipeData);
@@ -96,6 +86,7 @@ const RecipeDetail = () => {
         // Set initial likes count and liked by user
         setLikesCount(recipeData.likes || 0);
         if (user && recipeData.likedBy) {
+          // Check if the current user ID is in the likedBy array
           const isLiked = recipeData.likedBy.some(
             (userId) => userId === user._id || userId === user._id.toString()
           );
@@ -141,6 +132,7 @@ const RecipeDetail = () => {
     try {
       setUserRating(value);
       await axios.post(`/api/recipes/${id}/rate`, { value });
+      // Fetch updated recipe data to reflect new average rating
       const res = await axios.get(`/api/recipes/${id}`);
       setRecipe(res.data);
     } catch (err) {
@@ -200,6 +192,8 @@ const RecipeDetail = () => {
         onClose={closeModal}
         onConfirm={handleDelete}
         message="Are you sure you want to delete this recipe? This action cannot be undone."
+        title="Confirm Deletion"
+        isProcessing={deleting}
       />
 
       {showLoginModal && (
@@ -229,15 +223,17 @@ const RecipeDetail = () => {
         </Link>
 
        {recipe.image && (
-  <motion.img
-    src={getImageUrl(recipe.image)}
-    alt={recipe.title}
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 0.5 }}
-    className="w-full h-96 object-cover rounded-2xl mb-6 border border-[#44445e]"
-  />
-)}
+          <motion.img
+            // *** FIX FOR RENDER DEPLOYMENT ***
+            // The backend now provides the full Cloudinary URL, so we use it directly.
+            src={recipe.image}
+            alt={recipe.title}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="w-full h-96 object-cover rounded-2xl mb-6 border border-[#44445e]"
+          />
+        )}
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -257,7 +253,7 @@ const RecipeDetail = () => {
               liked ? "text-red-500" : "text-gray-500 hover:text-red-400"
             }`}
           >
-            <Heart size={28} />
+            <Heart size={28} fill={liked ? 'currentColor' : 'none'} />
           </button>
           <span className="select-none">
             {likesCount} {likesCount === 1 ? "like" : "likes"}
@@ -323,6 +319,7 @@ const RecipeDetail = () => {
             animate="visible"
             className="list-disc list-inside"
           >
+            {/* Handle both array and single string for ingredients */}
             {Array.isArray(recipe.ingredients) ? (
               recipe.ingredients.map((ingredient, idx) => (
                 <motion.li
@@ -355,6 +352,7 @@ const RecipeDetail = () => {
             animate="visible"
             className="list-decimal list-inside"
           >
+            {/* Handle both array and single string for instructions */}
             {Array.isArray(recipe.instructions) ? (
               recipe.instructions.map((step, idx) => (
                 <motion.li
@@ -378,7 +376,7 @@ const RecipeDetail = () => {
             <Link to={`/edit-recipe/${id}`}>
               <button
                 type="button"
-                className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-5 py-2 rounded-lg transition"
+                className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-5 py-2 rounded-lg transition shadow-md"
               >
                 <Pencil size={18} /> Edit
               </button>
@@ -388,7 +386,7 @@ const RecipeDetail = () => {
               type="button"
               onClick={openModal}
               disabled={deleting}
-              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-5 py-2 rounded-lg transition"
+              className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-5 py-2 rounded-lg transition shadow-md disabled:bg-red-800 disabled:cursor-not-allowed"
             >
               <Trash2 size={18} /> {deleting ? "Deleting..." : "Delete"}
             </button>
